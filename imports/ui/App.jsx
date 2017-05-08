@@ -8,17 +8,6 @@ import Task from './Task.jsx';
 
 // App component represents the whole App
 class App extends Component {
-
-  // Returns a list of tasks
-  /*
-  getTasks() {
-    return [
-      { _id: 1, text: 'This is task 1'},
-      { _id: 2, text: 'This is task 2'},
-      { _id: 3, text: 'This is task 3'},
-    ];
-  }*/
-
   // Maps Task component to HTML
   renderTasks() {
     return this.props.tasks.map((task) => (
@@ -32,6 +21,14 @@ class App extends Component {
       <div className="container">
         <header>
           <h1>Todo List</h1>
+
+          <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
+            <input
+              type="text"
+              ref="textInput"
+              placeholder="Type to add new tasks"
+            />
+          </form>
         </header>
 
         <ul>
