@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
 
 import { Tasks } from '../api/tasks.js';
@@ -8,6 +9,21 @@ import Task from './Task.jsx';
 
 // App component represents the whole App
 class App extends Component {
+  handleSubmit(event){
+    event.preventDefault();
+
+    // find the text field via React
+    const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
+
+    // Add this to the MongoDB
+    Tasks.insert({
+      text,
+      createdAt: new Date(),
+    });
+
+    // Clear the form
+    ReactDOM.findDOMNode(this.refs.textInput).value = '';
+  }
   // Maps Task component to HTML
   renderTasks() {
     return this.props.tasks.map((task) => (
