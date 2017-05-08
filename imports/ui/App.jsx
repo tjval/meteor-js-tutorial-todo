@@ -61,6 +61,12 @@ App.propTypes = {
 
 export default createContainer(() => {
   return {
-    tasks: Tasks.find({}).fetch(),
+    // We want the new tasks to appear at the top
+    // so we sort them
+    tasks: Tasks.find({}, {
+      sort: {
+        createdAt: -1
+      }
+    }).fetch(),
   };
 }, App);
