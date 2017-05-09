@@ -6,7 +6,7 @@ import { Tasks } from '../api/tasks.js';
 export default class Task extends Component {
   toggleChecked() {
     // Set the checked property to opposite value
-    Tasks.update(this.props.tasks._id, {
+    Tasks.update(this.props.task._id, {
         $set: { checked: !this.props.task.checked },
     });
   }

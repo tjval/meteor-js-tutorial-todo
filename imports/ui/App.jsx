@@ -9,6 +9,16 @@ import Task from './Task.jsx';
 
 // App component represents the whole App
 class App extends Component {
+  // Use the constructor to set the hideCompleted state
+  constructor(props) {
+    super(props);
+
+    this.toggleHideCompleted = this.toggleHideCompleted.bind(this);
+    this.state = {
+      hideCompleted: false,
+    };
+  }
+
   handleSubmit(event){
     event.preventDefault();
 
@@ -24,9 +34,22 @@ class App extends Component {
     // Clear the form
     ReactDOM.findDOMNode(this.refs.textInput).value = '';
   }
+
+  // Hides a task if it is completed by switching its state
+  toggleHideCompleted() {
+    this.setState({
+      hideCompleted: !this.state.hideCompleted,
+    });
+  }
+
   // Maps Task component to HTML
+  // Filters tasks by completed or not completed
   renderTasks() {
-    return this.props.tasks.map((task) => (
+    let filteredTasks = this.props.tasks;
+    if (this.state.hideCompleted) {
+      filteredTasks = filteredTasks.filter(task => !task.checked);
+    }
+    return filteredTasks.map((task) => (
       <Task key={task._id} task={task} />
     ));
   }
@@ -36,7 +59,17 @@ class App extends Component {
     return (
       <div className="container">
         <header>
-          <h1>Todo List</h1>
+          <h1>Todo List ({this.props.incompleteCount})</h1>
+
+          <label className="hide-completed">
+             <input
+              type="checkbox"
+              readOnly
+              checked={this.state.hideCompleted}
+              onClick={this.toggleHideCompleted}
+            ></input>
+            Hide Completed Tasks
+          </label>
 
           <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
             <input
@@ -57,16 +90,14 @@ class App extends Component {
 
 App.propTypes = {
   tasks: PropTypes.array.isRequired,
+  incompleteCount: PropTypes.number.isRequired,
 };
 
 export default createContainer(() => {
-  return {
     // We want the new tasks to appear at the top
     // so we sort them
-    tasks: Tasks.find({}, {
-      sort: {
-        createdAt: -1
-      }
-    }).fetch(),
-  };
-}, App);
+    return {
+      tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
+      incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
+    };
+  }, App);
