@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { createContainer } from 'meteor/react-meteor-data';
-
+import { Meteor } from 'meteor/meteor';
 import { Tasks } from '../api/tasks.js';
 
 import Task from './Task.jsx';
+import AccountsUIWrapper from './AccountsUIWrapper';
 
 
 // App component represents the whole App
@@ -29,6 +30,8 @@ class App extends Component {
     Tasks.insert({
       text,
       createdAt: new Date(),
+      owner: Meteor.userId(), // id of the logged in user
+      username: Meteor.user().username, // username of logged in user
     });
 
     // Clear the form
@@ -73,13 +76,15 @@ class App extends Component {
 
           <AccountsUIWrapper />
 
+          { this.props.currentUser ?
           <form className="new-task" onSubmit={this.handleSubmit.bind(this)}>
             <input
               type="text"
               ref="textInput"
               placeholder="Type to add new tasks"
             />
-          </form>
+          </form> : ''
+        }
         </header>
 
         <ul>
@@ -90,9 +95,11 @@ class App extends Component {
   }
 } // default class React
 
+// Think of these like variables
 App.propTypes = {
   tasks: PropTypes.array.isRequired,
   incompleteCount: PropTypes.number.isRequired,
+  currentUser: PropTypes.object,
 };
 
 export default createContainer(() => {
@@ -101,5 +108,6 @@ export default createContainer(() => {
     return {
       tasks: Tasks.find({}, { sort: { createdAt: -1 } }).fetch(),
       incompleteCount: Tasks.find({ checked: { $ne: true } }).count(),
+      currentUser: Meteor.user(),
     };
   }, App);
