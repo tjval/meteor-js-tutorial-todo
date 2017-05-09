@@ -27,12 +27,7 @@ class App extends Component {
     const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
 
     // Add this to the MongoDB
-    Tasks.insert({
-      text,
-      createdAt: new Date(),
-      owner: Meteor.userId(), // id of the logged in user
-      username: Meteor.user().username, // username of logged in user
-    });
+    Meteor.class('tasks.insert', text);
 
     // Clear the form
     ReactDOM.findDOMNode(this.refs.textInput).value = '';
