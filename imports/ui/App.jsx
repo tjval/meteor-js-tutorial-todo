@@ -27,7 +27,7 @@ class App extends Component {
     const text = ReactDOM.findDOMNode(this.refs.textInput).value.trim();
 
     // Add this to the MongoDB
-    Meteor.class('tasks.insert', text);
+    Meteor.call('tasks.insert', text);
 
     // Clear the form
     ReactDOM.findDOMNode(this.refs.textInput).value = '';
@@ -47,9 +47,18 @@ class App extends Component {
     if (this.state.hideCompleted) {
       filteredTasks = filteredTasks.filter(task => !task.checked);
     }
-    return filteredTasks.map((task) => (
-      <Task key={task._id} task={task} />
-    ));
+    return filteredTasks.map((task) => {
+      const currentUserId = this.props.currentUser && this.props.currentUser._id;
+      const showPrivateButton = task.owner === currentUserId;
+
+      return (
+        <Task
+          key={task._id}
+          task={task}
+          showPrivateButton={showPrivateButton}
+        />
+      );
+    });
   }
 
   // Puts it all together and renders every task
@@ -98,6 +107,8 @@ App.propTypes = {
 };
 
 export default createContainer(() => {
+    Meteor.subscribe('tasks');
+
     // We want the new tasks to appear at the top
     // so we sort them
     return {
